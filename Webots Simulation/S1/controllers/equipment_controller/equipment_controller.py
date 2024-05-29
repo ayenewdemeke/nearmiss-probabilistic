@@ -3,8 +3,9 @@ from controller import GPS, Accelerometer, Gyro
 import pandas as pd
 import math
 import numpy as np
+import random
 
-# Initialize the driver and set cruising speed
+# Initialize the driver and set initial speed
 driver = Driver()
 driver.setCruisingSpeed(10)
 
@@ -43,6 +44,9 @@ R = np.eye(3) * 0.1   # Measurement noise covariance matrix
 x = np.zeros((5, 1))  # Initial state (position, velocity, yaw)
 P = np.eye(5)  # Initial covariance matrix
 
+# Variable to track the last GPS update time
+last_gps_time = -1
+
 # Initialize a DataFrame to store the data
 data = []
 
@@ -50,9 +54,13 @@ data = []
 while driver.step() != -1:
     # Get the current simulation time in seconds
     current_time = driver.getTime()
+    
+    # Change speed
+    if int(current_time) % 3 == 0:
+        driver.setCruisingSpeed(random.uniform(5, 30))
 
-    # Turn at 2.5 seconds and revert at 5 seconds
-    if 4 < current_time < 4.2:
+    # Turn
+    if 30 < current_time < 30.2:
         driver.setSteeringAngle(-0.5)  # Turn angle
     else:
         driver.setSteeringAngle(0)
@@ -60,10 +68,14 @@ while driver.step() != -1:
     # Skip Kalman filter calculations for the first 1 second
     if current_time < 1:
         continue
-        
+    
     # Read the GPS data
-    position = gps.getValues()
-    gps_x, gps_y, gps_z = position
+    gps_updated = False
+    if int(current_time) != last_gps_time:
+        last_gps_time = int(current_time)
+        position = gps.getValues()
+        gps_x, gps_y, gps_z = position
+        gps_updated = True
     
     # Read the accelerometer data
     accel = accelerometer.getValues()
@@ -91,24 +103,23 @@ while driver.step() != -1:
     x[4] += yaw_rate * dt  # Integrate yaw rate to get yaw angle
     P = F @ P @ F.T + Q
     
-    # Check if GPS data is valid before updating
-    if not (np.isnan(gps_x) or np.isnan(gps_y)):
-        # Calculate yaw from velocity
-        vel_x, vel_y = x[2, 0], x[3, 0]
-        gps_yaw = math.atan2(vel_y, vel_x)
-        
-        # Kalman filter update step with GPS data and yaw
-        Z = np.array([[gps_x],
-                      [gps_y],
-                      [gps_yaw]])
-        y = Z - H @ x
-        S = H @ P @ H.T + R
-        
-        # Check for valid S to avoid division by zero
-        if np.linalg.det(S) != 0:
-            K = P @ H.T @ np.linalg.inv(S)
-            x = x + K @ y
-            P = (np.eye(5) - K @ H) @ P
+    # Kalman filter update step with GPS data
+    if gps_updated:
+        if not (np.isnan(gps_x) or np.isnan(gps_y)):
+            vel_x, vel_y = x[2, 0], x[3, 0]
+            gps_yaw = math.atan2(vel_y, vel_x)
+            
+            # Kalman filter update step with GPS data and yaw
+            Z = np.array([[gps_x],
+                          [gps_y],
+                          [gps_yaw]])
+            y = Z - H @ x
+            S = H @ P @ H.T + R
+            
+            if np.linalg.det(S) != 0:
+                K = P @ H.T @ np.linalg.inv(S)
+                x = x + K @ y
+                P = (np.eye(5) - K @ H) @ P
     
     # Extract the position, velocity, and direction from the state vector
     pos_x, pos_y, vel_x, vel_y, yaw = x.flatten()
@@ -117,12 +128,6 @@ while driver.step() != -1:
     
     # Append the data to the list
     data.append([current_time, gps_x, gps_y, gps_z, ax, ay, az, gx, gy, gz, pos_x, pos_y, vel_x, vel_y, speed, direction])
-
-    # Print or log the sensor data for debugging
-    print(f"Time: {current_time}, GPS Position: x={gps_x}, y={gps_y}, z={gps_z}")
-    print(f"Kalman Filter Position: x={pos_x}, y={pos_y}, Speed: {speed}, Direction: {direction}")
-    print(f"Accelerometer: ax={ax}, ay={ay}, az={az}")
-    print(f"Gyro: gx={gx}, gy={gy}, gz={gz}")
 
 # Create a DataFrame from the collected data
 df = pd.DataFrame(data, columns=['Time', 'GPS_X', 'GPS_Y', 'GPS_Z', 'Accel_X', 'Accel_Y', 'Accel_Z', 'Gyro_X', 'Gyro_Y', 'Gyro_Z', 'Pos_X', 'Pos_Y', 'Vel_X', 'Vel_Y', 'Speed', 'Direction'])
