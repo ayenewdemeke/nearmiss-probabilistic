@@ -1,12 +1,12 @@
 import math
-from controller import Supervisor, Node, Receiver
+from controller import Supervisor, Node, Receiver, Emitter
 
 def generate_gaussian_ellipse_points(sigma_x, sigma_y, confidence_level=0.3, num_points=100):
     k = math.sqrt(-2 * math.log(1 - confidence_level))
     a = sigma_x * k
     b = sigma_y * k
     points = [(a * math.cos(2 * math.pi * i / num_points), b * math.sin(2 * math.pi * i / num_points), 0) for i in range(num_points)]
-    return points
+    return points, a, b
 
 def create_shaded_ellipse(supervisor, points, translation, rotation, color):
     root = supervisor.getRoot()
@@ -96,9 +96,10 @@ equipment_2 = supervisor.getFromDef('EQUIPMENT_2')
 # Get the worker
 object_node = supervisor.getFromDef('WORKER')
 
-# Initialize the receiver
-receiver = supervisor.getDevice('receiver')
-receiver.enable(32)
+# Initialize the receiver and emitter
+receiver_supervisor = supervisor.getDevice('receiver_supervisor')
+receiver_supervisor.enable(32)
+emitter_supervisor = supervisor.getDevice('emitter_supervisor')
 
 kx = 2
 ky = 10
@@ -108,6 +109,19 @@ last_position = None
 last_vel_x = 0
 last_vel_y = 0
 
+# Timer for handling the reaction delay
+alert_triggered_time = None
+reaction_time = 2.5  # Time in seconds to apply brakes
+
+# Flag to ensure brakes are applied only once
+brakes_applied = False
+
+# Variable to track the final stopping position of the equipment
+final_position = None
+
+# Flag to ensure the condition check is done only once
+condition_checked = False
+
 # Simulation main loop
 while supervisor.step(32) != -1:
     
@@ -116,16 +130,16 @@ while supervisor.step(32) != -1:
     static_warning_zone.getField("translation").setSFVec3f(equipment_position)
     
     # Check for received messages
-    if receiver.getQueueLength() > 0:
-        message = receiver.getString()
-        receiver.nextPacket()
+    if receiver_supervisor.getQueueLength() > 0:
+        message = receiver_supervisor.getString()
+        receiver_supervisor.nextPacket()
         
         # Parse the received message
         pos_x, pos_y, vel_x, vel_y, yaw = map(float, message.split(','))
         velocity = [vel_x, vel_y, 0]  # Assuming 2D velocity
 
-        sigma_x = 2.9 + abs(1.61 * vel_x) + 0.17 * vel_x * vel_x
-        sigma_y = 2.1
+        sigma_x = 5.325 + abs(2.959 * vel_x) + 0.422 * vel_x * vel_x
+        sigma_y = 3.846
 
         confidence_intervals = [0.3]  # Only the danger zone
         colors = [(1, 0, 0)]  # Red
@@ -141,7 +155,7 @@ while supervisor.step(32) != -1:
 
         # Draw ellipses for different confidence levels
         for confidence_level, color, z_offset in zip(confidence_intervals, colors, z_offsets):
-            points = generate_gaussian_ellipse_points(sigma_x, sigma_y, confidence_level)
+            points, a, b = generate_gaussian_ellipse_points(sigma_x, sigma_y, confidence_level)
 
             # Calculate the rotation for the ellipse based on the computed velocities
             if vel_x != 0 or vel_y != 0:
@@ -164,9 +178,33 @@ while supervisor.step(32) != -1:
 
         if is_point_in_ellipse(object_position, translation, sigma_x, sigma_y, 0.3):
             danger_zone = True
+            if alert_triggered_time is None:
+                alert_triggered_time = supervisor.getTime()  # Record the time the alert is triggered
 
         # Check if the worker is in the hazard zone and alert
-        if is_within_radius(object_position, equipment_position, 10):
+        if is_within_radius(object_position, equipment_position, 10) or danger_zone:
             print("Alert! You are in the danger zone!")
-        elif danger_zone:
-            print("Alert! You are in the danger zone!")
+            
+        # Check if it's time to apply the brakes
+        if alert_triggered_time is not None and supervisor.getTime() - alert_triggered_time >= reaction_time:
+            emitter_supervisor.send("STOP".encode('utf-8'))
+            brakes_applied = True  # Flag to indicate brakes have been applied
+        
+        # Check if the equipment has come to rest
+        if brakes_applied and abs(vel_x) < 0.1 and abs(vel_y) < 0.1 and not condition_checked:
+            final_position = equipment_2.getField("translation").getSFVec3f()  # Record the final stopping position
+            worker_position = object_node.getPosition()
+            distance = math.sqrt((final_position[0] - worker_position[0])**2 + (final_position[1] - worker_position[1])**2)
+        
+            if distance < 1:
+                print(f"False Negative: The equipment hits the worker or comes within 1 meter before stopping. Actual distance: {distance:.2f} meters.")
+            elif 1 <= distance <= 4.5:
+                print(f"True Positive: The equipment stops with the worker 1 to 4.5 meters away. Actual distance: {distance:.2f} meters.")
+            elif distance > 4.5:
+                print(f"False Positive: The equipment stops with the worker more than 4.5 meters away. Actual distance: {distance:.2f} meters.")
+            else:
+                print(f"True Negative: No worker enters the hazard zone and no worker is within 4.5 meters. Actual distance: {distance:.2f} meters.")
+        
+            # Set the flag to true to prevent re-checking
+            condition_checked = True
+

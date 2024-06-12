@@ -81,8 +81,8 @@ WorldInfo {
   ]
 }
 Viewpoint {
-  orientation 0.12578104488044745 -0.9882832399496168 -0.08646020115331163 4.7759279228397675
-  position 210.20926636732645 2.2591663354429405 175.10170806550158
+  orientation -0.5773502691896258 0.5773502691896258 0.5773502691896258 2.0944
+  position 206.8395940978071 6.275578283452436 266.5273449307641
   near 1
   followSmoothness 0
 }
@@ -1939,7 +1939,7 @@ DEF SCONE34 Robot {
   }
 }
 DEF EQUIPMENT_1 Tractor {
-  translation 140 -5.5 0.61
+  translation -240 -5.5 0.61
   rotation 0 1 0 0.12999999999999926
   name "equipment_1"
   controller "<none>"
@@ -1953,12 +1953,16 @@ DEF EQUIPMENT_1 Tractor {
   ]
 }
 DEF EQUIPMENT_2 Tractor {
-  translation 200 -5.5 0.61
+  translation 100 -1.85 0.61
   rotation 0 1 0 0.12999999999999926
   name "tractor_2"
   controller "equipment_controller"
   sensorSlot [
+    Receiver {
+      name "receiver_equipment_2"
+    }
     Emitter {
+      name "emitter_equipment_2"
       channel 1
     }
     Gyro {
@@ -1970,7 +1974,7 @@ DEF EQUIPMENT_2 Tractor {
   ]
 }
 DEF STATIC_WARNING_ZONE Solid {
-  translation 140 -5.5 0.15
+  translation -240 -5.5 0.15
   children [
     Shape {
       appearance Appearance {
@@ -2005,7 +2009,11 @@ DEF DYNAMIC_WARNING_ZONE Solid {
 }
 DEF SUPERVISOR Robot {
   children [
+    Emitter {
+      name "emitter_supervisor"
+    }
     Receiver {
+      name "receiver_supervisor"
       channel 1
     }
   ]
@@ -2016,5 +2024,5 @@ DEF SUPERVISOR Robot {
   supervisor TRUE
 }
 DEF WORKER Pedestrian {
-  translation 265.27 -6.35 1.27
+  translation 280 -1.85 1.27
 }

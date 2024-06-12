@@ -1,5 +1,5 @@
 from vehicle import Driver
-from controller import GPS, Accelerometer, Gyro, Emitter
+from controller import GPS, Accelerometer, Gyro, Emitter, Receiver
 from sfusion.kalman import LinearKFGPSAccelerometerGyro2D
 import pandas as pd
 import math
@@ -8,7 +8,7 @@ import random
 
 # Initialize the driver and set initial speed
 driver = Driver()
-driver.setCruisingSpeed(10)
+driver.setCruisingSpeed(30)
 
 # Define the sensor sampling rates
 gps_sampling_rate = 1000  # 1000 milliseconds for 1 Hz
@@ -27,10 +27,14 @@ gyro = driver.getDevice('gyro')
 gyro.enable(accel_gyro_sampling_rate)
 
 # Initialize the emitter
-emitter = driver.getDevice('emitter')
+emitter_equipment_2 = driver.getDevice('emitter_equipment_2')
+
+# Initialize the receiver
+receiver_equipment_2 = driver.getDevice('receiver_equipment_2')
+receiver_equipment_2.enable(32)
 
 # Kalman filter variables
-initial_state = [200, -5.5, 0, 0, 0]  # Initial state (position, velocity, orientation)
+initial_state = [100, -1.85, 0, 0, 0]  # Initial state (position, velocity, orientation)
 initial_covariance = np.eye(5)  # Initial covariance matrix
 process_noise = np.eye(5) * 0.01  # Process noise covariance matrix
 measurement_noise = np.eye(2) * 0.1  # Measurement noise covariance matrix
@@ -51,18 +55,14 @@ accel_x_bias = -0.90416  # This value is based on your provided data
 while driver.step() != -1:
     # Get the current simulation time in seconds
     current_time = driver.getTime()
-    
-    # Skip sensor data reading for the first 5 seconds
-    if current_time < 2:
-        continue
-    
-    # Change speed every 5 seconds
-    if int(current_time) % 5 == 0:
-        driver.setCruisingSpeed(random.uniform(5, 30))
 
-    # Change direction every 20 seconds
-    # if int(current_time) % 20 == 0:
-        # driver.setSteeringAngle(random.uniform(-0.1, 0.1))
+    # Listen for a stop message from the supervisor and stop
+    if receiver_equipment_2.getQueueLength() > 0:
+        message = receiver_equipment_2.getString()
+        receiver_equipment_2.nextPacket()
+        
+        if message == "STOP":
+            driver.setCruisingSpeed(0)
 
     # Initialize variables to store sensor data for this iteration
     gps_x, gps_y, gps_z = None, None, None
@@ -103,7 +103,7 @@ while driver.step() != -1:
         
         # Prepare the data to send
         data_to_send = f"{pos_x},{pos_y},{vel_x},{vel_y},{yaw}"
-        emitter.send(data_to_send.encode('utf-8'))
+        emitter_equipment_2.send(data_to_send.encode('utf-8'))
         
         # Append the data to the list
         data.append([current_time, gps_x, gps_y, gps_z, ax, ay, az, gx, gy, gz, pos_x, pos_y, vel_x, vel_y, speed, direction])
