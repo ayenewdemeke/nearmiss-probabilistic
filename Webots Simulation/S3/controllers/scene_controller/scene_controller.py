@@ -77,18 +77,7 @@ def is_point_in_ellipse(point, center, sigma_x, sigma_y, confidence_level=0.95):
         return True
     return False
 
-def is_within_radius(point1, point2, radius):
-    dx = point1[0] - point2[0]
-    dy = point1[1] - point2[1]
-    dz = point1[2] - point2[2]
-    distance = math.sqrt(dx**2 + dy**2 + dz**2)
-    return distance <= radius
-
 supervisor = Supervisor()
-
-# Get references to the equipment and the static zone
-equipment_1 = supervisor.getFromDef("EQUIPMENT_1")
-static_warning_zone = supervisor.getFromDef("STATIC_WARNING_ZONE")
 
 # Get the equipment node
 equipment_2 = supervisor.getFromDef('EQUIPMENT_2')
@@ -125,10 +114,6 @@ condition_checked = False
 # Simulation main loop
 while supervisor.step(32) != -1:
     
-    # Update the position of the static zone to match the equipment's position
-    equipment_position = equipment_1.getField("translation").getSFVec3f()
-    static_warning_zone.getField("translation").setSFVec3f(equipment_position)
-    
     # Check for received messages
     if receiver_supervisor.getQueueLength() > 0:
         message = receiver_supervisor.getString()
@@ -141,10 +126,6 @@ while supervisor.step(32) != -1:
         sigma_x = 5.325 + abs(2.959 * vel_x) + 0.422 * vel_x * vel_x
         sigma_y = 3.846
 
-        confidence_intervals = [0.3]  # Only the danger zone
-        colors = [(1, 0, 0)]  # Red
-        z_offsets = [0.2]  # Z offsets for visibility
-
         # Remove previous ellipses
         root = supervisor.getRoot()
         children_field = root.getField("children")
@@ -153,26 +134,25 @@ while supervisor.step(32) != -1:
             if child.getType() == Node.TRANSFORM:
                 children_field.removeMF(i)
 
-        # Draw ellipses for different confidence levels
-        for confidence_level, color, z_offset in zip(confidence_intervals, colors, z_offsets):
-            points, a, b = generate_gaussian_ellipse_points(sigma_x, sigma_y, confidence_level)
+        # Draw the single ellipse
+        points, a, b = generate_gaussian_ellipse_points(sigma_x, sigma_y)
 
-            # Calculate the rotation for the ellipse based on the computed velocities
-            if vel_x != 0 or vel_y != 0:
-                direction_rad = math.atan2(vel_y, vel_x)
-            else:
-                direction_rad = 0
-            rotation = [0, 0, 1, direction_rad]  # Rotate around the Z-axis
+        # Calculate the rotation for the ellipse based on the computed velocities
+        if vel_x != 0 or vel_y != 0:
+            direction_rad = math.atan2(vel_y, vel_x)
+        else:
+            direction_rad = 0
+        rotation = [0, 0, 1, direction_rad]  # Rotate around the Z-axis
 
-            # Get the translation of the equipment with an offset to the front
-            translation = [pos_x, pos_y, 0]  # Use the received position
-            translation = get_front_position(equipment_2)
-            translation[2] += z_offset  # Add the z offset
+        # Get the translation of the equipment with an offset to the front
+        translation = [pos_x, pos_y, 0]  # Use the received position
+        translation = get_front_position(equipment_2)
+        translation[2] += 0.2  # Add the z offset
 
-            # Draw the shaded ellipse at the adjusted position
-            create_shaded_ellipse(supervisor, points, translation, rotation, color)
+        # Draw the shaded ellipse at the adjusted position
+        create_shaded_ellipse(supervisor, points, translation, rotation, (1, 0, 0))
 
-        # Check if the object is within the ellipses
+        # Check if the object is within the ellipse
         object_position = object_node.getPosition()
         danger_zone = False
 
@@ -182,7 +162,7 @@ while supervisor.step(32) != -1:
                 alert_triggered_time = supervisor.getTime()  # Record the time the alert is triggered
 
         # Check if the worker is in the hazard zone and alert
-        if is_within_radius(object_position, equipment_position, 10) or danger_zone:
+        if danger_zone:
             print("Alert! You are in the danger zone!")
             
         # Check if it's time to apply the brakes
@@ -207,4 +187,3 @@ while supervisor.step(32) != -1:
         
             # Set the flag to true to prevent re-checking
             condition_checked = True
-

@@ -1,6 +1,6 @@
 from vehicle import Driver
 from controller import GPS, Accelerometer, Gyro, Emitter, Receiver
-from sfusion.kalman import LinearKFGPSAccelerometerGyro2D
+from sfusion.kalman import EKFGPSAccelerometerGyro2D
 import pandas as pd
 import math
 import numpy as np
@@ -40,7 +40,7 @@ process_noise = np.eye(5) * 0.01  # Process noise covariance matrix
 measurement_noise = np.eye(2) * 0.1  # Measurement noise covariance matrix
 
 # Create the Kalman Filter instance
-kf = LinearKFGPSAccelerometerGyro2D(initial_state, initial_covariance, process_noise, measurement_noise)
+kf = EKFGPSAccelerometerGyro2D(initial_state, initial_covariance, process_noise, measurement_noise)
 
 # Variable to track the last GPS update time
 last_gps_update_time = -1

@@ -82,7 +82,7 @@ WorldInfo {
 }
 Viewpoint {
   orientation -0.5773502691896258 0.5773502691896258 0.5773502691896258 2.0944
-  position 206.8395940978071 6.275578283452436 266.5273449307641
+  position 189.18102036176302 2.739120964021518 232.11744222749553
   near 1
   followSmoothness 0
 }
@@ -1955,6 +1955,7 @@ DEF EQUIPMENT_1 Tractor {
 DEF EQUIPMENT_2 Tractor {
   translation 100 -1.85 0.61
   rotation 0 1 0 0.12999999999999926
+  color 0.239216 0.529412 0.788235
   name "tractor_2"
   controller "equipment_controller"
   sensorSlot [
