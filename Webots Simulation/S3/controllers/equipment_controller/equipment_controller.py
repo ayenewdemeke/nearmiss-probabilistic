@@ -4,7 +4,6 @@ from sfusion.kalman import EKFGPSAccelerometerGyro2D
 import pandas as pd
 import math
 import numpy as np
-import random
 
 # Initialize the driver and set initial speed
 driver = Driver()
@@ -27,16 +26,16 @@ gyro = driver.getDevice('gyro')
 gyro.enable(accel_gyro_sampling_rate)
 
 # Initialize the emitter
-emitter_equipment_2 = driver.getDevice('emitter_equipment_2')
+emitter_equipment = driver.getDevice('emitter_equipment')
 
 # Initialize the receiver
-receiver_equipment_2 = driver.getDevice('receiver_equipment_2')
-receiver_equipment_2.enable(32)
+receiver_equipment = driver.getDevice('receiver_equipment')
+receiver_equipment.enable(32)
 
 # Kalman filter variables
 initial_state = [100, -1.85, 0, 0, 0]  # Initial state (position, velocity, orientation)
 initial_covariance = np.eye(5)  # Initial covariance matrix
-process_noise = np.eye(5) * 0.01  # Process noise covariance matrix
+process_noise = np.eye(5) * 0.1  # Process noise covariance matrix
 measurement_noise = np.eye(2) * 0.1  # Measurement noise covariance matrix
 
 # Create the Kalman Filter instance
@@ -49,7 +48,7 @@ last_gps_update_time = -1
 data = []
 
 # Accelerometer bias
-accel_x_bias = -0.90416  # This value is based on your provided data
+accel_x_bias = -0.904155  # This value is based on your provided data
 
 # Main simulation loop
 while driver.step() != -1:
@@ -57,13 +56,22 @@ while driver.step() != -1:
     current_time = driver.getTime()
 
     # Listen for a stop message from the supervisor and stop
-    if receiver_equipment_2.getQueueLength() > 0:
-        message = receiver_equipment_2.getString()
-        receiver_equipment_2.nextPacket()
+    if receiver_equipment.getQueueLength() > 0:
+        message = receiver_equipment.getString()
+        receiver_equipment.nextPacket()
         
+        # Handle the stop message
         if message == "STOP":
             driver.setCruisingSpeed(0)
-
+        
+        # Handle the reset message
+        if message == "RESET":
+            kf = EKFGPSAccelerometerGyro2D(initial_state, initial_covariance, process_noise, measurement_noise)
+            # Generate a random cruising speed with a mean of 20 and std of 5 (from 5 - 40)
+            speed = np.random.normal(20, 5)
+            speed = max(5, min(speed, 40))
+            driver.setCruisingSpeed(speed)
+            
     # Initialize variables to store sensor data for this iteration
     gps_x, gps_y, gps_z = None, None, None
     
@@ -103,7 +111,7 @@ while driver.step() != -1:
         
         # Prepare the data to send
         data_to_send = f"{pos_x},{pos_y},{vel_x},{vel_y},{yaw}"
-        emitter_equipment_2.send(data_to_send.encode('utf-8'))
+        emitter_equipment.send(data_to_send.encode('utf-8'))
         
         # Append the data to the list
         data.append([current_time, gps_x, gps_y, gps_z, ax, ay, az, gx, gy, gz, pos_x, pos_y, vel_x, vel_y, speed, direction])
@@ -112,4 +120,4 @@ while driver.step() != -1:
 df = pd.DataFrame(data, columns=['Time', 'GPS_X', 'GPS_Y', 'GPS_Z', 'Accel_X', 'Accel_Y', 'Accel_Z', 'Gyro_X', 'Gyro_Y', 'Gyro_Z', 'Pos_X', 'Pos_Y', 'Vel_X', 'Vel_Y', 'Speed', 'Direction'])
 
 # Export the DataFrame to a CSV file
-df.to_csv('equipment_data.csv', index=False)
+df.to_csv('sensor_data.csv', index=False)

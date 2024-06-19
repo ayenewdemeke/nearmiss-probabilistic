@@ -1986,23 +1986,6 @@ DEF STATIC_WARNING_ZONE Solid {
   ]
   name "static_warning_zone"
 }
-DEF DYNAMIC_WARNING_ZONE Solid {
-  translation 150 -5.5 0.15
-  children [
-    Shape {
-      appearance Appearance {
-        material Material {
-          diffuseColor 1 0.666667 0
-        }
-      }
-      geometry IndexedFaceSet {
-        coord Coordinate {
-        }
-      }
-    }
-  ]
-  name "dynamic_warning_zone"
-}
 DEF SUPERVISOR Robot {
   children [
     Receiver {

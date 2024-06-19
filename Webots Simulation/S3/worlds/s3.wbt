@@ -4,8 +4,8 @@ EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/project
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/road/protos/RoadLine.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/road/protos/StraightRoadSegment.proto"
-EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/vehicles/protos/generic/Tractor.proto"
 EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/humans/pedestrian/protos/Pedestrian.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/vehicles/protos/generic/Tractor.proto"
 
 WorldInfo {
   info [
@@ -82,7 +82,7 @@ WorldInfo {
 }
 Viewpoint {
   orientation -0.5773502691896258 0.5773502691896258 0.5773502691896258 2.0944
-  position 189.18102036176302 2.739120964021518 232.11744222749553
+  position 199.61343183547365 2.519839668035259 258.6150799266292
   near 1
   followSmoothness 0
 }
@@ -1938,33 +1938,17 @@ DEF SCONE34 Robot {
     }
   }
 }
-DEF EQUIPMENT_1 Tractor {
-  translation -240 -5.5 0.61
-  rotation 0 1 0 0.12999999999999926
-  name "equipment_1"
-  controller "<none>"
-  sensorSlot [
-    Gyro {
-    }
-    GPS {
-    }
-    Accelerometer {
-    }
-  ]
-}
-DEF EQUIPMENT_2 Tractor {
-  translation 100 -1.85 0.61
-  rotation 0 1 0 0.12999999999999926
-  color 0.239216 0.529412 0.788235
-  name "tractor_2"
+DEF EQUIPMENT Tractor {
+  translation 100 -1.85 0.6
+  name "equipment"
   controller "equipment_controller"
   sensorSlot [
     Receiver {
-      name "receiver_equipment_2"
+      name "receiver_equipment"
+      channel 1
     }
     Emitter {
-      name "emitter_equipment_2"
-      channel 1
+      name "emitter_equipment"
     }
     Gyro {
     }
@@ -1991,34 +1975,17 @@ DEF STATIC_WARNING_ZONE Solid {
   ]
   name "static_warning_zone"
 }
-DEF DYNAMIC_WARNING_ZONE Solid {
-  translation 150 -5.5 0.15
-  children [
-    Shape {
-      appearance Appearance {
-        material Material {
-          diffuseColor 1 0.666667 0
-        }
-      }
-      geometry IndexedFaceSet {
-        coord Coordinate {
-        }
-      }
-    }
-  ]
-  name "dynamic_warning_zone"
-}
 DEF SUPERVISOR Robot {
   children [
     Emitter {
       name "emitter_supervisor"
+      channel 1
     }
     Receiver {
       name "receiver_supervisor"
-      channel 1
     }
   ]
-  controller "scene_controller"
+  controller "supervisor_controller"
   controllerArgs [
     ""
   ]
