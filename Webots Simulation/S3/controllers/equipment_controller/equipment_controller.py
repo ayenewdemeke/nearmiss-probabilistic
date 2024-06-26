@@ -1,13 +1,13 @@
 from vehicle import Driver
 from controller import GPS, Accelerometer, Gyro, Emitter, Receiver
 from sfusion.kalman import EKFGPSAccelerometerGyro2D
-import pandas as pd
+# import pandas as pd
 import math
 import numpy as np
 
 # Initialize the driver and set initial speed
 driver = Driver()
-driver.setCruisingSpeed(30)
+driver.setCruisingSpeed(10)
 
 # Define the sensor sampling rates
 gps_sampling_rate = 1000  # 1000 milliseconds for 1 Hz
@@ -68,9 +68,13 @@ while driver.step() != -1:
         if message == "RESET":
             kf = EKFGPSAccelerometerGyro2D(initial_state, initial_covariance, process_noise, measurement_noise)
             # Generate a random cruising speed with a mean of 20 and std of 5 (from 5 - 40)
-            speed = np.random.normal(20, 5)
-            speed = max(5, min(speed, 40))
+            speed = np.random.normal(10, 5)
+            speed = max(2, min(speed, 20))
             driver.setCruisingSpeed(speed)
+            
+            # Send the new speed to the supervisor
+            speed_message = f"SPEED,{speed}"
+            emitter_equipment.send(speed_message.encode('utf-8'))
             
     # Initialize variables to store sensor data for this iteration
     gps_x, gps_y, gps_z = None, None, None
@@ -106,18 +110,23 @@ while driver.step() != -1:
         
         # Extract the position, velocity, and direction from the state vector
         pos_x, pos_y, vel_x, vel_y, yaw = kf.state.flatten()
-        speed = math.sqrt(vel_x**2 + vel_y**2)
-        direction = math.degrees(yaw)  # Convert yaw to degrees
+        # speed = math.sqrt(vel_x**2 + vel_y**2)
+        # direction = math.degrees(yaw)  # Convert yaw to degrees
+        
+        # Set speed to zero for the first second of the simulation
+        if current_time < 5:
+            vel_x = 0
+            vel_y = 0
         
         # Prepare the data to send
         data_to_send = f"{pos_x},{pos_y},{vel_x},{vel_y},{yaw}"
         emitter_equipment.send(data_to_send.encode('utf-8'))
         
         # Append the data to the list
-        data.append([current_time, gps_x, gps_y, gps_z, ax, ay, az, gx, gy, gz, pos_x, pos_y, vel_x, vel_y, speed, direction])
+        # data.append([current_time, gps_x, gps_y, gps_z, ax, ay, az, gx, gy, gz, pos_x, pos_y, vel_x, vel_y, speed, direction])
 
 # Create a DataFrame from the collected data
-df = pd.DataFrame(data, columns=['Time', 'GPS_X', 'GPS_Y', 'GPS_Z', 'Accel_X', 'Accel_Y', 'Accel_Z', 'Gyro_X', 'Gyro_Y', 'Gyro_Z', 'Pos_X', 'Pos_Y', 'Vel_X', 'Vel_Y', 'Speed', 'Direction'])
+# df = pd.DataFrame(data, columns=['Time', 'GPS_X', 'GPS_Y', 'GPS_Z', 'Accel_X', 'Accel_Y', 'Accel_Z', 'Gyro_X', 'Gyro_Y', 'Gyro_Z', 'Pos_X', 'Pos_Y', 'Vel_X', 'Vel_Y', 'Speed', 'Direction'])
 
 # Export the DataFrame to a CSV file
-df.to_csv('sensor_data.csv', index=False)
+# df.to_csv('sensor_data.csv', index=False)

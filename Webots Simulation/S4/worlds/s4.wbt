@@ -1,0 +1,1996 @@
+#VRML_SIM R2023b utf8
+
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackground.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/backgrounds/protos/TexturedBackgroundLight.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/road/protos/RoadLine.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/objects/road/protos/StraightRoadSegment.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/humans/pedestrian/protos/Pedestrian.proto"
+EXTERNPROTO "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/vehicles/protos/generic/Tractor.proto"
+
+WorldInfo {
+  info [
+    "Autonomous Vehicle Simulation"
+    "The simple controller example uses an on-board camera to follow the yellow road lines and a SICK sensor to avoid the obstacles."
+    "The control of the vehicle is done using the driver library."
+    "The vehicle based on the Car PROTO is modelled with realistic physics properties: motor torques, body mass, friction forces, suspensions, etc."
+  ]
+  title "City"
+  ERP 0.6
+  basicTimeStep 10
+  lineScale 1
+  contactProperties [
+    ContactProperties {
+      coulombFriction [
+        8
+      ]
+      softCFM 1e-05
+      bumpSound ""
+      rollSound ""
+      slideSound ""
+    }
+    ContactProperties {
+      material2 "CitroenCZeroWheels"
+      coulombFriction [
+        8
+      ]
+      softCFM 1e-05
+      bumpSound ""
+      rollSound ""
+      slideSound ""
+    }
+    ContactProperties {
+      material2 "ToyotaPriusWheels"
+      coulombFriction [
+        8
+      ]
+      softCFM 1e-05
+      bumpSound ""
+      rollSound ""
+      slideSound ""
+    }
+    ContactProperties {
+      material2 "LincolnMKZWheels"
+      coulombFriction [
+        8
+      ]
+      softCFM 1e-05
+      bumpSound ""
+      rollSound ""
+      slideSound ""
+    }
+    ContactProperties {
+      material2 "RangeRoverSportSVRWheels"
+      coulombFriction [
+        8
+      ]
+      softCFM 1e-05
+      bumpSound ""
+      rollSound ""
+      slideSound ""
+    }
+    ContactProperties {
+      material2 "TruckWheels"
+      coulombFriction [
+        8
+      ]
+      softCFM 1e-05
+      bumpSound ""
+      rollSound ""
+      slideSound ""
+    }
+  ]
+}
+Viewpoint {
+  orientation -0.5773502691896258 0.5773502691896258 0.5773502691896258 2.0944
+  position 192.79417539528094 2.488093329742117 249.3304327959222
+  near 1
+  followSmoothness 0
+}
+TexturedBackground {
+}
+TexturedBackgroundLight {
+}
+Fog {
+  color 0.38 0.35 0.32
+  visibilityRange 1000
+}
+DEF GROUND Solid {
+  children [
+    Shape {
+      appearance PBRAppearance {
+        baseColor 0.8 0.8 0.8
+        baseColorMap ImageTexture {
+          url [
+            "https://raw.githubusercontent.com/cyberbotics/webots/R2023b/projects/vehicles/worlds/textures/ground.jpg"
+          ]
+        }
+        roughness 0.5
+        metalness 0
+        textureTransform TextureTransform {
+          scale 500 500
+        }
+      }
+      geometry DEF GROUND_PLANE Plane {
+        size 2000 2000
+      }
+    }
+  ]
+  boundingObject USE GROUND_PLANE
+  locked TRUE
+}
+StraightRoadSegment {
+  translation -500 0 0.02
+  id "1"
+  startJunction "19"
+  endJunction "18"
+  width 14.8
+  numberOfLanes 4
+  numberOfForwardLanes 2
+  lines [
+    RoadLine {
+    }
+    RoadLine {
+      color 0.85 0.75 0.3
+      type "double"
+    }
+  ]
+  length 1000
+}
+DEF SCONE1 Robot {
+  translation 0 -7.2 0.35
+  children [
+    Solid {
+      translation 0 0 -0.3
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0 0 0
+            }
+          }
+          geometry Box {
+            size 0.38 0.38 0.05
+          }
+        }
+      ]
+      name "solid(1)"
+    }
+    Solid {
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.952941 0.32549 0.0117647
+            }
+          }
+          geometry Cone {
+            bottomRadius 0.15
+            height 0.71
+            subdivision 100
+          }
+        }
+      ]
+    }
+    GPS {
+    }
+    Gyro {
+    }
+    Accelerometer {
+    }
+  ]
+  name "robot1"
+  boundingObject Cylinder {
+    height 0.71
+    radius 0.15
+  }
+  physics Physics {
+    mass 3.63
+    damping Damping {
+    }
+  }
+}
+DEF SCONE1 Robot {
+  translation 7.62 -6.83 0.35
+  children [
+    Solid {
+      translation 0 0 -0.3
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0 0 0
+            }
+          }
+          geometry Box {
+            size 0.38 0.38 0.05
+          }
+        }
+      ]
+      name "solid(1)"
+    }
+    Solid {
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.952941 0.32549 0.0117647
+            }
+          }
+          geometry Cone {
+            bottomRadius 0.15
+            height 0.71
+            subdivision 100
+          }
+        }
+      ]
+    }
+    GPS {
+    }
+    Gyro {
+    }
+    Accelerometer {
+    }
+  ]
+  name "robot2"
+  boundingObject Cylinder {
+    height 0.71
+    radius 0.15
+  }
+  physics Physics {
+    mass 3.63
+    damping Damping {
+    }
+  }
+}
+DEF SCONE3 Robot {
+  translation 15.24 -6.26 0.35
+  children [
+    Solid {
+      translation 0 0 -0.3
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0 0 0
+            }
+          }
+          geometry Box {
+            size 0.38 0.38 0.05
+          }
+        }
+      ]
+      name "solid(1)"
+    }
+    Solid {
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.952941 0.32549 0.0117647
+            }
+          }
+          geometry Cone {
+            bottomRadius 0.15
+            height 0.71
+            subdivision 100
+          }
+        }
+      ]
+    }
+    GPS {
+    }
+    Gyro {
+    }
+    Accelerometer {
+    }
+  ]
+  name "robot3"
+  boundingObject Cylinder {
+    height 0.71
+    radius 0.15
+  }
+  physics Physics {
+    mass 3.63
+    damping Damping {
+    }
+  }
+}
+DEF SCONE4 Robot {
+  translation 22.86 -5.69 0.35
+  children [
+    Solid {
+      translation 0 0 -0.3
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0 0 0
+            }
+          }
+          geometry Box {
+            size 0.38 0.38 0.05
+          }
+        }
+      ]
+      name "solid(1)"
+    }
+    Solid {
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.952941 0.32549 0.0117647
+            }
+          }
+          geometry Cone {
+            bottomRadius 0.15
+            height 0.71
+            subdivision 100
+          }
+        }
+      ]
+    }
+    GPS {
+    }
+    Gyro {
+    }
+    Accelerometer {
+    }
+  ]
+  name "robot4"
+  boundingObject Cylinder {
+    height 0.71
+    radius 0.15
+  }
+  physics Physics {
+    mass 3.63
+    damping Damping {
+    }
+  }
+}
+DEF SCONE5 Robot {
+  translation 30.48 -5.12 0.35
+  children [
+    Solid {
+      translation 0 0 -0.3
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0 0 0
+            }
+          }
+          geometry Box {
+            size 0.38 0.38 0.05
+          }
+        }
+      ]
+      name "solid(1)"
+    }
+    Solid {
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.952941 0.32549 0.0117647
+            }
+          }
+          geometry Cone {
+            bottomRadius 0.15
+            height 0.71
+            subdivision 100
+          }
+        }
+      ]
+    }
+    GPS {
+    }
+    Gyro {
+    }
+    Accelerometer {
+    }
+  ]
+  name "robot5"
+  boundingObject Cylinder {
+    height 0.71
+    radius 0.15
+  }
+  physics Physics {
+    mass 3.63
+    damping Damping {
+    }
+  }
+}
+DEF SCONE6 Robot {
+  translation 38.1 -4.55 0.35
+  children [
+    Solid {
+      translation 0 0 -0.3
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0 0 0
+            }
+          }
+          geometry Box {
+            size 0.38 0.38 0.05
+          }
+        }
+      ]
+      name "solid(1)"
+    }
+    Solid {
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.952941 0.32549 0.0117647
+            }
+          }
+          geometry Cone {
+            bottomRadius 0.15
+            height 0.71
+            subdivision 100
+          }
+        }
+      ]
+    }
+    GPS {
+    }
+    Gyro {
+    }
+    Accelerometer {
+    }
+  ]
+  name "robot6"
+  boundingObject Cylinder {
+    height 0.71
+    radius 0.15
+  }
+  physics Physics {
+    mass 3.63
+    damping Damping {
+    }
+  }
+}
+DEF SCONE7 Robot {
+  translation 45.72 -3.98 0.35
+  children [
+    Solid {
+      translation 0 0 -0.3
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0 0 0
+            }
+          }
+          geometry Box {
+            size 0.38 0.38 0.05
+          }
+        }
+      ]
+      name "solid(1)"
+    }
+    Solid {
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.952941 0.32549 0.0117647
+            }
+          }
+          geometry Cone {
+            bottomRadius 0.15
+            height 0.71
+            subdivision 100
+          }
+        }
+      ]
+    }
+    GPS {
+    }
+    Gyro {
+    }
+    Accelerometer {
+    }
+  ]
+  name "robot7"
+  boundingObject Cylinder {
+    height 0.71
+    radius 0.15
+  }
+  physics Physics {
+    mass 3.63
+    damping Damping {
+    }
+  }
+}
+DEF SCONE8 Robot {
+  translation 53.34 -3.42 0.35
+  children [
+    Solid {
+      translation 0 0 -0.3
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0 0 0
+            }
+          }
+          geometry Box {
+            size 0.38 0.38 0.05
+          }
+        }
+      ]
+      name "solid(1)"
+    }
+    Solid {
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.952941 0.32549 0.0117647
+            }
+          }
+          geometry Cone {
+            bottomRadius 0.15
+            height 0.71
+            subdivision 100
+          }
+        }
+      ]
+    }
+    GPS {
+    }
+    Gyro {
+    }
+    Accelerometer {
+    }
+  ]
+  name "robot8"
+  boundingObject Cylinder {
+    height 0.71
+    radius 0.15
+  }
+  physics Physics {
+    mass 3.63
+    damping Damping {
+    }
+  }
+}
+DEF SCONE9 Robot {
+  translation 60.96 -2.85 0.35
+  children [
+    Solid {
+      translation 0 0 -0.3
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0 0 0
+            }
+          }
+          geometry Box {
+            size 0.38 0.38 0.05
+          }
+        }
+      ]
+      name "solid(1)"
+    }
+    Solid {
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.952941 0.32549 0.0117647
+            }
+          }
+          geometry Cone {
+            bottomRadius 0.15
+            height 0.71
+            subdivision 100
+          }
+        }
+      ]
+    }
+    GPS {
+    }
+    Gyro {
+    }
+    Accelerometer {
+    }
+  ]
+  name "robot9"
+  boundingObject Cylinder {
+    height 0.71
+    radius 0.15
+  }
+  physics Physics {
+    mass 3.63
+    damping Damping {
+    }
+  }
+}
+DEF SCONE10 Robot {
+  translation 68.58 -2.28 0.35
+  children [
+    Solid {
+      translation 0 0 -0.3
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0 0 0
+            }
+          }
+          geometry Box {
+            size 0.38 0.38 0.05
+          }
+        }
+      ]
+      name "solid(1)"
+    }
+    Solid {
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.952941 0.32549 0.0117647
+            }
+          }
+          geometry Cone {
+            bottomRadius 0.15
+            height 0.71
+            subdivision 100
+          }
+        }
+      ]
+    }
+    GPS {
+    }
+    Gyro {
+    }
+    Accelerometer {
+    }
+  ]
+  name "robot10"
+  boundingObject Cylinder {
+    height 0.71
+    radius 0.15
+  }
+  physics Physics {
+    mass 3.63
+    damping Damping {
+    }
+  }
+}
+DEF SCONE11 Robot {
+  translation 76.2 -1.71 0.35
+  children [
+    Solid {
+      translation 0 0 -0.3
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0 0 0
+            }
+          }
+          geometry Box {
+            size 0.38 0.38 0.05
+          }
+        }
+      ]
+      name "solid(1)"
+    }
+    Solid {
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.952941 0.32549 0.0117647
+            }
+          }
+          geometry Cone {
+            bottomRadius 0.15
+            height 0.71
+            subdivision 100
+          }
+        }
+      ]
+    }
+    GPS {
+    }
+    Gyro {
+    }
+    Accelerometer {
+    }
+  ]
+  name "robot11"
+  boundingObject Cylinder {
+    height 0.71
+    radius 0.15
+  }
+  physics Physics {
+    mass 3.63
+    damping Damping {
+    }
+  }
+}
+DEF SCONE12 Robot {
+  translation 83.82 -1.14 0.35
+  children [
+    Solid {
+      translation 0 0 -0.3
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0 0 0
+            }
+          }
+          geometry Box {
+            size 0.38 0.38 0.05
+          }
+        }
+      ]
+      name "solid(1)"
+    }
+    Solid {
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.952941 0.32549 0.0117647
+            }
+          }
+          geometry Cone {
+            bottomRadius 0.15
+            height 0.71
+            subdivision 100
+          }
+        }
+      ]
+    }
+    GPS {
+    }
+    Gyro {
+    }
+    Accelerometer {
+    }
+  ]
+  name "robot12"
+  boundingObject Cylinder {
+    height 0.71
+    radius 0.15
+  }
+  physics Physics {
+    mass 3.63
+    damping Damping {
+    }
+  }
+}
+DEF SCONE13 Robot {
+  translation 91.44 -0.57 0.35
+  children [
+    Solid {
+      translation 0 0 -0.3
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0 0 0
+            }
+          }
+          geometry Box {
+            size 0.38 0.38 0.05
+          }
+        }
+      ]
+      name "solid(1)"
+    }
+    Solid {
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.952941 0.32549 0.0117647
+            }
+          }
+          geometry Cone {
+            bottomRadius 0.15
+            height 0.71
+            subdivision 100
+          }
+        }
+      ]
+    }
+    GPS {
+    }
+    Gyro {
+    }
+    Accelerometer {
+    }
+  ]
+  name "robot13"
+  boundingObject Cylinder {
+    height 0.71
+    radius 0.15
+  }
+  physics Physics {
+    mass 3.63
+    damping Damping {
+    }
+  }
+}
+DEF SCONE14 Robot {
+  translation 99.06 0 0.35
+  children [
+    Solid {
+      translation 0 0 -0.3
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0 0 0
+            }
+          }
+          geometry Box {
+            size 0.38 0.38 0.05
+          }
+        }
+      ]
+      name "solid(1)"
+    }
+    Solid {
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.952941 0.32549 0.0117647
+            }
+          }
+          geometry Cone {
+            bottomRadius 0.15
+            height 0.71
+            subdivision 100
+          }
+        }
+      ]
+    }
+    GPS {
+    }
+    Gyro {
+    }
+    Accelerometer {
+    }
+  ]
+  name "robot14"
+  boundingObject Cylinder {
+    height 0.71
+    radius 0.15
+  }
+  physics Physics {
+    mass 3.63
+    damping Damping {
+    }
+  }
+}
+DEF SCONE15 Robot {
+  translation 114.3 0 0.35
+  children [
+    Solid {
+      translation 0 0 -0.3
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0 0 0
+            }
+          }
+          geometry Box {
+            size 0.38 0.38 0.05
+          }
+        }
+      ]
+      name "solid(1)"
+    }
+    Solid {
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.952941 0.32549 0.0117647
+            }
+          }
+          geometry Cone {
+            bottomRadius 0.15
+            height 0.71
+            subdivision 100
+          }
+        }
+      ]
+    }
+    GPS {
+    }
+    Gyro {
+    }
+    Accelerometer {
+    }
+  ]
+  name "robot15"
+  boundingObject Cylinder {
+    height 0.71
+    radius 0.15
+  }
+  physics Physics {
+    mass 3.63
+    damping Damping {
+    }
+  }
+}
+DEF SCONE16 Robot {
+  translation 129.54 0 0.35
+  children [
+    Solid {
+      translation 0 0 -0.3
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0 0 0
+            }
+          }
+          geometry Box {
+            size 0.38 0.38 0.05
+          }
+        }
+      ]
+      name "solid(1)"
+    }
+    Solid {
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.952941 0.32549 0.0117647
+            }
+          }
+          geometry Cone {
+            bottomRadius 0.15
+            height 0.71
+            subdivision 100
+          }
+        }
+      ]
+    }
+    GPS {
+    }
+    Gyro {
+    }
+    Accelerometer {
+    }
+  ]
+  name "robot16"
+  boundingObject Cylinder {
+    height 0.71
+    radius 0.15
+  }
+  physics Physics {
+    mass 3.63
+    damping Damping {
+    }
+  }
+}
+DEF SCONE17 Robot {
+  translation 144.78 0 0.35
+  children [
+    Solid {
+      translation 0 0 -0.3
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0 0 0
+            }
+          }
+          geometry Box {
+            size 0.38 0.38 0.05
+          }
+        }
+      ]
+      name "solid(1)"
+    }
+    Solid {
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.952941 0.32549 0.0117647
+            }
+          }
+          geometry Cone {
+            bottomRadius 0.15
+            height 0.71
+            subdivision 100
+          }
+        }
+      ]
+    }
+    GPS {
+    }
+    Gyro {
+    }
+    Accelerometer {
+    }
+  ]
+  name "robot17"
+  boundingObject Cylinder {
+    height 0.71
+    radius 0.15
+  }
+  physics Physics {
+    mass 3.63
+    damping Damping {
+    }
+  }
+}
+DEF SCONE18 Robot {
+  translation 160.02 0 0.35
+  children [
+    Solid {
+      translation 0 0 -0.3
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0 0 0
+            }
+          }
+          geometry Box {
+            size 0.38 0.38 0.05
+          }
+        }
+      ]
+      name "solid(1)"
+    }
+    Solid {
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.952941 0.32549 0.0117647
+            }
+          }
+          geometry Cone {
+            bottomRadius 0.15
+            height 0.71
+            subdivision 100
+          }
+        }
+      ]
+    }
+    GPS {
+    }
+    Gyro {
+    }
+    Accelerometer {
+    }
+  ]
+  name "robot18"
+  boundingObject Cylinder {
+    height 0.71
+    radius 0.15
+  }
+  physics Physics {
+    mass 3.63
+    damping Damping {
+    }
+  }
+}
+DEF SCONE19 Robot {
+  translation 175.26 0 0.35
+  children [
+    Solid {
+      translation 0 0 -0.3
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0 0 0
+            }
+          }
+          geometry Box {
+            size 0.38 0.38 0.05
+          }
+        }
+      ]
+      name "solid(1)"
+    }
+    Solid {
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.952941 0.32549 0.0117647
+            }
+          }
+          geometry Cone {
+            bottomRadius 0.15
+            height 0.71
+            subdivision 100
+          }
+        }
+      ]
+    }
+    GPS {
+    }
+    Gyro {
+    }
+    Accelerometer {
+    }
+  ]
+  name "robot19"
+  boundingObject Cylinder {
+    height 0.71
+    radius 0.15
+  }
+  physics Physics {
+    mass 3.63
+    damping Damping {
+    }
+  }
+}
+DEF SCONE20 Robot {
+  translation 190.5 0 0.35
+  children [
+    Solid {
+      translation 0 0 -0.3
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0 0 0
+            }
+          }
+          geometry Box {
+            size 0.38 0.38 0.05
+          }
+        }
+      ]
+      name "solid(1)"
+    }
+    Solid {
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.952941 0.32549 0.0117647
+            }
+          }
+          geometry Cone {
+            bottomRadius 0.15
+            height 0.71
+            subdivision 100
+          }
+        }
+      ]
+    }
+    GPS {
+    }
+    Gyro {
+    }
+    Accelerometer {
+    }
+  ]
+  name "robot20"
+  boundingObject Cylinder {
+    height 0.71
+    radius 0.15
+  }
+  physics Physics {
+    mass 3.63
+    damping Damping {
+    }
+  }
+}
+DEF SCONE21 Robot {
+  translation 205.74 0 0.35
+  children [
+    Solid {
+      translation 0 0 -0.3
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0 0 0
+            }
+          }
+          geometry Box {
+            size 0.38 0.38 0.05
+          }
+        }
+      ]
+      name "solid(1)"
+    }
+    Solid {
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.952941 0.32549 0.0117647
+            }
+          }
+          geometry Cone {
+            bottomRadius 0.15
+            height 0.71
+            subdivision 100
+          }
+        }
+      ]
+    }
+    GPS {
+    }
+    Gyro {
+    }
+    Accelerometer {
+    }
+  ]
+  name "robot21"
+  boundingObject Cylinder {
+    height 0.71
+    radius 0.15
+  }
+  physics Physics {
+    mass 3.63
+    damping Damping {
+    }
+  }
+}
+DEF SCONE22 Robot {
+  translation 220.98 0 0.35
+  children [
+    Solid {
+      translation 0 0 -0.3
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0 0 0
+            }
+          }
+          geometry Box {
+            size 0.38 0.38 0.05
+          }
+        }
+      ]
+      name "solid(1)"
+    }
+    Solid {
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.952941 0.32549 0.0117647
+            }
+          }
+          geometry Cone {
+            bottomRadius 0.15
+            height 0.71
+            subdivision 100
+          }
+        }
+      ]
+    }
+    GPS {
+    }
+    Gyro {
+    }
+    Accelerometer {
+    }
+  ]
+  name "robot22"
+  boundingObject Cylinder {
+    height 0.71
+    radius 0.15
+  }
+  physics Physics {
+    mass 3.63
+    damping Damping {
+    }
+  }
+}
+DEF SCONE23 Robot {
+  translation 236.22 0 0.35
+  children [
+    Solid {
+      translation 0 0 -0.3
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0 0 0
+            }
+          }
+          geometry Box {
+            size 0.38 0.38 0.05
+          }
+        }
+      ]
+      name "solid(1)"
+    }
+    Solid {
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.952941 0.32549 0.0117647
+            }
+          }
+          geometry Cone {
+            bottomRadius 0.15
+            height 0.71
+            subdivision 100
+          }
+        }
+      ]
+    }
+    GPS {
+    }
+    Gyro {
+    }
+    Accelerometer {
+    }
+  ]
+  name "robot23"
+  boundingObject Cylinder {
+    height 0.71
+    radius 0.15
+  }
+  physics Physics {
+    mass 3.63
+    damping Damping {
+    }
+  }
+}
+DEF SCONE24 Robot {
+  translation 251.46 0 0.35
+  children [
+    Solid {
+      translation 0 0 -0.3
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0 0 0
+            }
+          }
+          geometry Box {
+            size 0.38 0.38 0.05
+          }
+        }
+      ]
+      name "solid(1)"
+    }
+    Solid {
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.952941 0.32549 0.0117647
+            }
+          }
+          geometry Cone {
+            bottomRadius 0.15
+            height 0.71
+            subdivision 100
+          }
+        }
+      ]
+    }
+    GPS {
+    }
+    Gyro {
+    }
+    Accelerometer {
+    }
+  ]
+  name "robot24"
+  boundingObject Cylinder {
+    height 0.71
+    radius 0.15
+  }
+  physics Physics {
+    mass 3.63
+    damping Damping {
+    }
+  }
+}
+DEF SCONE25 Robot {
+  translation 266.7 0 0.35
+  children [
+    Solid {
+      translation 0 0 -0.3
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0 0 0
+            }
+          }
+          geometry Box {
+            size 0.38 0.38 0.05
+          }
+        }
+      ]
+      name "solid(1)"
+    }
+    Solid {
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.952941 0.32549 0.0117647
+            }
+          }
+          geometry Cone {
+            bottomRadius 0.15
+            height 0.71
+            subdivision 100
+          }
+        }
+      ]
+    }
+    GPS {
+    }
+    Gyro {
+    }
+    Accelerometer {
+    }
+  ]
+  name "robot25"
+  boundingObject Cylinder {
+    height 0.71
+    radius 0.15
+  }
+  physics Physics {
+    mass 3.63
+    damping Damping {
+    }
+  }
+}
+DEF SCONE26 Robot {
+  translation 281.94 0 0.35
+  children [
+    Solid {
+      translation 0 0 -0.3
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0 0 0
+            }
+          }
+          geometry Box {
+            size 0.38 0.38 0.05
+          }
+        }
+      ]
+      name "solid(1)"
+    }
+    Solid {
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.952941 0.32549 0.0117647
+            }
+          }
+          geometry Cone {
+            bottomRadius 0.15
+            height 0.71
+            subdivision 100
+          }
+        }
+      ]
+    }
+    GPS {
+    }
+    Gyro {
+    }
+    Accelerometer {
+    }
+  ]
+  name "robot26"
+  boundingObject Cylinder {
+    height 0.71
+    radius 0.15
+  }
+  physics Physics {
+    mass 3.63
+    damping Damping {
+    }
+  }
+}
+DEF SCONE27 Robot {
+  translation 297.18 0 0.35
+  children [
+    Solid {
+      translation 0 0 -0.3
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0 0 0
+            }
+          }
+          geometry Box {
+            size 0.38 0.38 0.05
+          }
+        }
+      ]
+      name "solid(1)"
+    }
+    Solid {
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.952941 0.32549 0.0117647
+            }
+          }
+          geometry Cone {
+            bottomRadius 0.15
+            height 0.71
+            subdivision 100
+          }
+        }
+      ]
+    }
+    GPS {
+    }
+    Gyro {
+    }
+    Accelerometer {
+    }
+  ]
+  name "robot27"
+  boundingObject Cylinder {
+    height 0.71
+    radius 0.15
+  }
+  physics Physics {
+    mass 3.63
+    damping Damping {
+    }
+  }
+}
+DEF SCONE28 Robot {
+  translation 300.99 -1.06 0.35
+  children [
+    Solid {
+      translation 0 0 -0.3
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0 0 0
+            }
+          }
+          geometry Box {
+            size 0.38 0.38 0.05
+          }
+        }
+      ]
+      name "solid(1)"
+    }
+    Solid {
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.952941 0.32549 0.0117647
+            }
+          }
+          geometry Cone {
+            bottomRadius 0.15
+            height 0.71
+            subdivision 100
+          }
+        }
+      ]
+    }
+    GPS {
+    }
+    Gyro {
+    }
+    Accelerometer {
+    }
+  ]
+  name "robot28"
+  boundingObject Cylinder {
+    height 0.71
+    radius 0.15
+  }
+  physics Physics {
+    mass 3.63
+    damping Damping {
+    }
+  }
+}
+DEF SCONE29 Robot {
+  translation 304.8 -2.11 0.35
+  children [
+    Solid {
+      translation 0 0 -0.3
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0 0 0
+            }
+          }
+          geometry Box {
+            size 0.38 0.38 0.05
+          }
+        }
+      ]
+      name "solid(1)"
+    }
+    Solid {
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.952941 0.32549 0.0117647
+            }
+          }
+          geometry Cone {
+            bottomRadius 0.15
+            height 0.71
+            subdivision 100
+          }
+        }
+      ]
+    }
+    GPS {
+    }
+    Gyro {
+    }
+    Accelerometer {
+    }
+  ]
+  name "robot29"
+  boundingObject Cylinder {
+    height 0.71
+    radius 0.15
+  }
+  physics Physics {
+    mass 3.63
+    damping Damping {
+    }
+  }
+}
+DEF SCONE30 Robot {
+  translation 308.61 -3.17 0.35
+  children [
+    Solid {
+      translation 0 0 -0.3
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0 0 0
+            }
+          }
+          geometry Box {
+            size 0.38 0.38 0.05
+          }
+        }
+      ]
+      name "solid(1)"
+    }
+    Solid {
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.952941 0.32549 0.0117647
+            }
+          }
+          geometry Cone {
+            bottomRadius 0.15
+            height 0.71
+            subdivision 100
+          }
+        }
+      ]
+    }
+    GPS {
+    }
+    Gyro {
+    }
+    Accelerometer {
+    }
+  ]
+  name "robot30"
+  boundingObject Cylinder {
+    height 0.71
+    radius 0.15
+  }
+  physics Physics {
+    mass 3.63
+    damping Damping {
+    }
+  }
+}
+DEF SCONE31 Robot {
+  translation 312.42 -4.23 0.35
+  children [
+    Solid {
+      translation 0 0 -0.3
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0 0 0
+            }
+          }
+          geometry Box {
+            size 0.38 0.38 0.05
+          }
+        }
+      ]
+      name "solid(1)"
+    }
+    Solid {
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.952941 0.32549 0.0117647
+            }
+          }
+          geometry Cone {
+            bottomRadius 0.15
+            height 0.71
+            subdivision 100
+          }
+        }
+      ]
+    }
+    GPS {
+    }
+    Gyro {
+    }
+    Accelerometer {
+    }
+  ]
+  name "robot31"
+  boundingObject Cylinder {
+    height 0.71
+    radius 0.15
+  }
+  physics Physics {
+    mass 3.63
+    damping Damping {
+    }
+  }
+}
+DEF SCONE32 Robot {
+  translation 316.23 -5.29 0.35
+  children [
+    Solid {
+      translation 0 0 -0.3
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0 0 0
+            }
+          }
+          geometry Box {
+            size 0.38 0.38 0.05
+          }
+        }
+      ]
+      name "solid(1)"
+    }
+    Solid {
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.952941 0.32549 0.0117647
+            }
+          }
+          geometry Cone {
+            bottomRadius 0.15
+            height 0.71
+            subdivision 100
+          }
+        }
+      ]
+    }
+    GPS {
+    }
+    Gyro {
+    }
+    Accelerometer {
+    }
+  ]
+  name "robot32"
+  boundingObject Cylinder {
+    height 0.71
+    radius 0.15
+  }
+  physics Physics {
+    mass 3.63
+    damping Damping {
+    }
+  }
+}
+DEF SCONE33 Robot {
+  translation 320.04 -6.34 0.35
+  children [
+    Solid {
+      translation 0 0 -0.3
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0 0 0
+            }
+          }
+          geometry Box {
+            size 0.38 0.38 0.05
+          }
+        }
+      ]
+      name "solid(1)"
+    }
+    Solid {
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.952941 0.32549 0.0117647
+            }
+          }
+          geometry Cone {
+            bottomRadius 0.15
+            height 0.71
+            subdivision 100
+          }
+        }
+      ]
+    }
+    GPS {
+    }
+    Gyro {
+    }
+    Accelerometer {
+    }
+  ]
+  name "robot33"
+  boundingObject Cylinder {
+    height 0.71
+    radius 0.15
+  }
+  physics Physics {
+    mass 3.63
+    damping Damping {
+    }
+  }
+}
+DEF SCONE34 Robot {
+  translation 323.85 -7.2 0.35
+  children [
+    Solid {
+      translation 0 0 -0.3
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0 0 0
+            }
+          }
+          geometry Box {
+            size 0.38 0.38 0.05
+          }
+        }
+      ]
+      name "solid(1)"
+    }
+    Solid {
+      children [
+        Shape {
+          appearance Appearance {
+            material Material {
+              diffuseColor 0.952941 0.32549 0.0117647
+            }
+          }
+          geometry Cone {
+            bottomRadius 0.15
+            height 0.71
+            subdivision 100
+          }
+        }
+      ]
+    }
+    GPS {
+    }
+    Gyro {
+    }
+    Accelerometer {
+    }
+  ]
+  name "robot34"
+  boundingObject Cylinder {
+    height 0.71
+    radius 0.15
+  }
+  physics Physics {
+    mass 3.63
+    damping Damping {
+    }
+  }
+}
+DEF EQUIPMENT Tractor {
+  translation 100 -1.85 0.6
+  name "equipment"
+  controller "equipment_controller"
+  sensorSlot [
+    Receiver {
+      name "receiver_equipment"
+      channel 1
+    }
+    Emitter {
+      name "emitter_equipment"
+    }
+    Gyro {
+    }
+    GPS {
+    }
+    Accelerometer {
+    }
+  ]
+}
+DEF STATIC_WARNING_ZONE Solid {
+  translation 101 -1.85 0.15
+  children [
+    Shape {
+      appearance Appearance {
+        material Material {
+          diffuseColor 1 0 0
+        }
+      }
+      geometry Cylinder {
+        height 0.1
+        radius 13
+      }
+    }
+  ]
+  name "static_warning_zone"
+}
+DEF SUPERVISOR Robot {
+  children [
+    Emitter {
+      name "emitter_supervisor"
+      channel 1
+    }
+    Receiver {
+      name "receiver_supervisor"
+    }
+  ]
+  controller "supervisor_controller"
+  controllerArgs [
+    ""
+  ]
+  supervisor TRUE
+}
+DEF WORKER Pedestrian {
+  translation 280 -1.85 1.27
+}

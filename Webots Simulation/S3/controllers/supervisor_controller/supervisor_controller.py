@@ -63,7 +63,7 @@ def get_center_position(node, offset=1):
     
     return new_position
 
-def is_point_in_ellipse(point, center, sigma_x, sigma_y, confidence_level=0.95):
+def is_point_in_ellipse(point, center, sigma_x, sigma_y, confidence_level=0.3):
     k = math.sqrt(-2 * math.log(1 - confidence_level))
     a = sigma_x * k
     b = sigma_y * k
@@ -78,15 +78,31 @@ def is_point_in_ellipse(point, center, sigma_x, sigma_y, confidence_level=0.95):
     if (dx**2 / a**2 + dy**2 / b**2) <= 1:
         return True
     return False
+
+# Function to check if a point is within a rectangle
+def is_point_in_rectangle(point, center, length, width):
+    x, y, _ = point
+    cx, cy, _ = center
+    
+    half_length = length / 2
+    half_width = width / 2
+    
+    return (cx - half_length <= x <= cx + half_length) and (cy - half_width <= y <= cy + half_width)
     
 def set_worker_position(worker):
-    # Define the range and grid points for x and y coordinates
-    x_values = np.linspace(260, 300, 5)  # 5 rows from 260 to 300
-    y_values = np.linspace(-3.85, 0.15, 5)  # 9 points from -5.85 to 2.15
-
-    # Randomly select a point from the grid and set the position
-    x = np.random.choice(x_values)
-    y = np.random.choice(y_values)
+    # Define the mean and standard deviation for x and y coordinates
+    mean_x, std_x = 280, 5
+    mean_y, std_y = -1.85, 3
+    
+    # Generate x and y values from a normal distribution and limit them within the range
+    x = np.random.normal(mean_x, std_x)
+    y = np.random.normal(mean_y, std_y)
+    
+    # Ensure x and y are within the specified range
+    x = max(260, min(x, 300))
+    y = max(-9.25, min(y, 5.55))
+    
+    # Set the position of the worker
     worker.getField('translation').setSFVec3f([x, y, 1.27])
 
 def run_hazard_zone_simulation(supervisor, reaction_time=2.5):
@@ -94,6 +110,9 @@ def run_hazard_zone_simulation(supervisor, reaction_time=2.5):
     alert_triggered_time = None
     brakes_applied = False
     condition_checked = False
+    was_in_inner_boundary = False
+    was_in_outer_boundary = False
+    min_distance = 100
 
     # Get the equipment node
     equipment = supervisor.getFromDef('EQUIPMENT')
@@ -108,6 +127,11 @@ def run_hazard_zone_simulation(supervisor, reaction_time=2.5):
     emitter_supervisor = supervisor.getDevice('emitter_supervisor')
     
     translation = None
+    
+    # Set equipment dimensions in meter and initial speed in km/h
+    equipment_length = 3
+    equipment_width = 1.7
+    equipment_speed = 20
 
     # Simulation loop
     while supervisor.step(32) != -1:
@@ -116,12 +140,18 @@ def run_hazard_zone_simulation(supervisor, reaction_time=2.5):
             message = receiver_supervisor.getString()
             receiver_supervisor.nextPacket()
             
+            # Handle speed reset messages
+            if message.startswith("SPEED"):
+                _, speed = message.split(',')
+                equipment_speed = float(speed)
+                continue  # Continue to the next iteration
+            
             # Parse the received message
             pos_x, pos_y, vel_x, vel_y, yaw = map(float, message.split(','))
             velocity = [vel_x, vel_y, 0]  # Assuming 2D velocity
 
-            sigma_x = 5.325 + abs(2.959 * vel_x) + 0.422 * vel_x * vel_x
-            sigma_y = 3.846
+            sigma_x = 2.367 + 0.592 * equipment_length + abs(2.959 * vel_x) + 0.563 * vel_x * vel_x
+            sigma_y = 2.367 + 0.592 * equipment_width
 
             # Remove previous ellipses
             root = supervisor.getRoot()
@@ -134,27 +164,21 @@ def run_hazard_zone_simulation(supervisor, reaction_time=2.5):
             # Generate ellipse points
             points, a, b = generate_gaussian_ellipse_points(sigma_x, sigma_y)
 
-            # Calculate the rotation for the ellipse based on the computed velocities
-            if vel_x != 0 or vel_y != 0:
-                direction_rad = math.atan2(vel_y, vel_x)
-            else:
-                direction_rad = 0
-            rotation = [0, 0, 1, direction_rad]  # Rotate around the Z-axis
+            # Use the received yaw for rotation
+            rotation = [0, 0, 1, yaw]  # Rotate around the Z-axis
 
-            # Get the translation and cruising speed of the equipment with an offset to the front
-            translation = [pos_x, pos_y, 0]
+            # Get the translation of the equipment with an offset to the front
             translation = get_center_position(equipment)
-            equipment_speed = 10 # Dummy value
             
             # Draw the shaded ellipse at the adjusted position
             # create_shaded_ellipse(supervisor, points, translation, rotation, (1, 0, 0))
 
             # Check if the object is within the ellipse
-            object_position = worker.getPosition()
+            worker_position = worker.getPosition()
             danger_zone = False
 
             # Check if the point is within the ellipse
-            if is_point_in_ellipse(object_position, translation, sigma_x, sigma_y, 0.3):
+            if is_point_in_ellipse(worker_position, translation, sigma_x, sigma_y):
                 danger_zone = True
                 if alert_triggered_time is None:
                     alert_triggered_time = supervisor.getTime()  # Record the time the alert is triggered
@@ -162,22 +186,29 @@ def run_hazard_zone_simulation(supervisor, reaction_time=2.5):
             # Check if the worker is in the hazard zone and alert
             # if danger_zone:
                 # print("Alert! You are in the danger zone!")
+            
+            # Track worker's position relative to ellipses during the movement
+            worker_position = worker.getPosition()
+            if is_point_in_rectangle(worker_position, translation, 5, 3.7):
+                was_in_inner_boundary = True
+            elif is_point_in_rectangle(worker_position, translation, 13, 9.1):
+                was_in_outer_boundary = True
+            current_distance = math.sqrt((translation[0] - worker_position[0])**2 + (translation[1] - worker_position[1])**2)
+            if current_distance < min_distance:
+                min_distance = current_distance
                 
             # Check if it's time to apply the brakes
             if alert_triggered_time is not None and supervisor.getTime() - alert_triggered_time >= reaction_time:
                 emitter_supervisor.send("STOP".encode('utf-8'))
                 brakes_applied = True  # Flag to indicate brakes have been applied
             
-            # Check if the equipment has come to rest
-            if brakes_applied and abs(vel_x) < 0.1 and abs(vel_y) < 0.1 and not condition_checked:
-                worker_position = worker.getPosition()
-                distance = math.sqrt((translation[0] - worker_position[0])**2 + (translation[1] - worker_position[1])**2)
-                
-                if distance < 2:
+            # Check if the equipment has come to rest and condition hasn't been checked
+            if alert_triggered_time and brakes_applied and not condition_checked and abs(vel_x) < 0.1 and abs(vel_y) < 0.1:
+                if was_in_inner_boundary:
                     result = "False Negative"
-                elif 2 <= distance <= 5.5:
+                elif was_in_outer_boundary:
                     result = "True Positive"
-                elif distance > 5.5:
+                else:
                     result = "False Positive"
                 
                 # Set the flag to true to prevent re-checking
@@ -185,27 +216,31 @@ def run_hazard_zone_simulation(supervisor, reaction_time=2.5):
                 emitter_supervisor.send("RESET".encode('utf-8'))
                 set_worker_position(worker) # Set worker to new position
                 equipment.getField('translation').setSFVec3f(initial_position)  # Reset equipment position
-
-                return equipment_speed, worker_position, distance, result  # Return the result for this run
-        
-            # Check for True Negative case
-            if not brakes_applied and not condition_checked and translation is not None:
-                worker_position = worker.getPosition()
-                distance = math.sqrt((translation[0] - worker_position[0])**2 + (translation[1] - worker_position[1])**2)
             
-                if translation[0] > worker_position[0]:
+                return equipment_speed, worker_position, min_distance, result  # Return the result for this run
+            
+            # Check for True Negative case if condition has not been checked yet
+            else:
+                worker_position = worker.getPosition()
+                
+                # Apply brakes if the equipment has passed the worker
+                if translation[0] > worker_position[0] and not brakes_applied:
+                    emitter_supervisor.send("STOP".encode('utf-8'))
+                    brakes_applied = True
+                
+                # Ensure the equipment has come to a stop before classifying as True Negative
+                elif brakes_applied and abs(vel_x) < 0.1 and abs(vel_y) < 0.1:
                     result = "True Negative"
-                    condition_checked = True  # Set the flag to true to prevent re-printing
+                    condition_checked = True
                     emitter_supervisor.send("RESET".encode('utf-8'))
-                     
                     set_worker_position(worker) # Set worker to new position
                     equipment.getField('translation').setSFVec3f(initial_position)  # Reset equipment position
                     
-                    return equipment_speed, worker_position, distance, result  # Return the result for this run
+                    return equipment_speed, worker_position, min_distance, result  # Return the result for this run    
 
 # Main script
 supervisor = Supervisor()
-SIMULATION_RUN_COUNT = 35  # Number of simulation runs
+SIMULATION_RUN_COUNT = 100  # Number of simulation runs
 
 results = []
 
